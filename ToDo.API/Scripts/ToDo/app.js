@@ -1,15 +1,22 @@
 ﻿
 var ViewModel = function () {
     var self = this;
+
+    // Used to define model properties which can notify the changes 
+    // and update the model automatically.
     self.Id = ko.observable();
     self.Description = ko.observable("");
     self.IsDone = ko.observable(false);
 
+    // Used to bind list of ToDo elements
     self.toDoList = ko.observableArray();
+    self.isNotDoneList = ko.observableArray();
+
+    // Uri-API address
     var toDoListUri = '/api/ToDoLists/';
 
-    function ajaxFunction(uri, method, data) {
-        //self.errorMessage('');
+    // jQuery’s Ajax helper method for creating, reading, updating and deleting.
+    function ajaxFunction(uri, method, data) { 
         return $.ajax({
             type: method,
             url: uri,
@@ -52,6 +59,7 @@ var ViewModel = function () {
             ajaxFunction(toDoListUri, 'POST', ToDoObject).done(function () {
                 self.clearFields();
                 alert('ToDo Added Successfully !');
+                //self.toDoList.push(ToDoObject);
                 getToDoList()
             });
         }
@@ -105,7 +113,7 @@ var ViewModel = function () {
     //DELETE / Remove an toDoList object from the list and database
     //////////////////////////////////////////////////////////////
     self.deleteToDo = function (toDo) {
-        if (confirm('Are you sure to Delete ID "' + toDo.Id + '" ??')) {
+        if (confirm('Are you sure to Delete this item (ID=' + toDo.Id + ')?')) {
             ajaxFunction(toDoListUri + toDo.Id, 'DELETE').done(function () {
                 getToDoList();
             })
