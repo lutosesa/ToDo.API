@@ -12,19 +12,23 @@
     {
         private ToDoListContext db = new ToDoListContext();
 
-
+        #region GetToDoLists        
         /// <summary>
+        /// Get all intances/objects of ToDoList available. 
         /// GET: api/ToDoLists
         /// </summary>
         /// <returns></returns>
         public IQueryable<ToDoList> GetToDoLists()
         {
-            return db.ToDoLists;
+            return db.ToDoLists.OrderByDescending(item => item.Id);
         }
+        #endregion
 
 
+        #region GetToDoList with parameter
         /// <summary>
-        ///  GET: api/ToDoLists/{id}
+        /// Get a single intance/object of ToDoList. 
+        /// GET: api/ToDoLists/{id}
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -39,8 +43,17 @@
 
             return Ok(toDoList);
         }
+        #endregion
 
-        // PUT: api/ToDoLists/{id}
+
+        #region PutToDoList with two parameters        
+        /// <summary>
+        /// Update a single intance/object of ToDoList.   
+        /// PUT: api/ToDoLists/{id}
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="toDoList"></param>
+        /// <returns></returns>
         [ResponseType(typeof(void))]
         public IHttpActionResult PutToDoList(int id, ToDoList toDoList)
         {
@@ -74,8 +87,16 @@
 
             return StatusCode(HttpStatusCode.NoContent);
         }
+        #endregion
 
-        // POST: api/ToDoLists
+
+        #region  PostToDoList with parameter        
+        /// <summary>
+        /// Create a new intance/object of ToDoList. 
+        /// POST: api/ToDoLists
+        /// </summary>
+        /// <param name="toDoList"></param>
+        /// <returns></returns>
         [ResponseType(typeof(ToDoList))]
         public IHttpActionResult PostToDoList(ToDoList toDoList)
         {
@@ -89,8 +110,16 @@
 
             return CreatedAtRoute("DefaultApi", new { id = toDoList.Id }, toDoList);
         }
+        #endregion
 
-        // DELETE: api/ToDoLists/{id}
+
+        #region DeleteToDoList with parameter        
+        /// <summary>
+        /// Delete a singel intance/object of ToDoList. 
+        /// DELETE: api/ToDoLists/{id}
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [ResponseType(typeof(ToDoList))]
         public IHttpActionResult DeleteToDoList(int id)
         {
@@ -105,7 +134,11 @@
 
             return Ok(toDoList);
         }
+        #endregion
 
+
+
+        #region Dispose with parameter        
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -114,10 +147,13 @@
             }
             base.Dispose(disposing);
         }
+        #endregion
 
+        #region ToDoListExists with parameter 
         private bool ToDoListExists(int id)
         {
             return db.ToDoLists.Count(e => e.Id == id) > 0;
         }
+        #endregion
     }
 }
