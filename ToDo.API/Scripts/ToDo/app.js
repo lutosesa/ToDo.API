@@ -2,20 +2,28 @@
 var ViewModel = function () {
     var self = this;
 
-    // Used to define model properties which can notify the changes 
-    // and update the model automatically.
-    self.Id = ko.observable();
-    self.Description = ko.observable("");
-    self.IsDone = ko.observable(false);
-
-    // Used to bind list of ToDo elements
-    self.toDoList = ko.observableArray();
-    self.isNotDoneList = ko.observableArray();
-
     // Uri-API address
     var toDoListUri = '/api/ToDoLists/';
 
-    // jQuery’s Ajax helper method for creating, reading, updating and deleting.
+    // Headline for the column/field "IsDone"
+    var seletedHeadlines = ['All Items', 'Not Done', 'Done']
+
+    // Used to define model properties which can notify the changes 
+    // and update the model automatically.
+    self.Id = ko.observable();
+    self.Description = ko.observable('');
+    self.IsDone = ko.observable(false);
+
+    // Used to bind list of ToDoList items
+    self.toDoList = ko.observableArray();
+   
+    self.selectedItems = ko.observableArray(seletedHeadlines);
+    self.selected = ko.observable('');
+
+    /////////////////////////////////////////////////////////////////////
+    // jQuery’s Ajax function for requests to create-POST, read-GET, 
+    // update-PUT and delete-DELETE.
+    /////////////////////////////////////////////////////////////////////
     function ajaxFunction(uri, method, data) { 
         return $.ajax({
             type: method,
@@ -29,7 +37,7 @@ var ViewModel = function () {
     }
 
     //////////////////////////////////////////////////////////////
-    // GET / Show all toDoList objects (data).
+    // GET / Show all toDoList objects/items (data).
     //////////////////////////////////////////////////////////////
     function getToDoList() {
         ajaxFunction(toDoListUri, 'GET').done(function (data) {
@@ -55,7 +63,7 @@ var ViewModel = function () {
             IsDone: self.IsDone()
         };
 
-        if (ToDoObject.Description != "" ) {
+        if (ToDoObject.Description != '' ) {
             ajaxFunction(toDoListUri, 'POST', ToDoObject).done(function () {
                 self.clearFields();
                 alert('ToDo Added Successfully !');
@@ -79,6 +87,7 @@ var ViewModel = function () {
         $('#Clear').hide();
         $('#Update').show();
         $('#Cancel').show();
+        $('#IsDone-group').show();
     };
     self.cancel = function () {
         self.clearFields();
@@ -86,6 +95,7 @@ var ViewModel = function () {
         $('#Clear').show();
         $('#Update').hide();
         $('#Cancel').hide();
+        $('#IsDone-group').hide();
     }
 
     //////////////////////////////////////////////////////////////
@@ -109,9 +119,9 @@ var ViewModel = function () {
         }
     }
 
-    //////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
     //DELETE / Remove an toDoList object from the list and database
-    //////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
     self.deleteToDo = function (toDo) {
         if (confirm('Are you sure to Delete this item (ID=' + toDo.Id + ')?')) {
             ajaxFunction(toDoListUri + toDo.Id, 'DELETE').done(function () {
@@ -120,6 +130,24 @@ var ViewModel = function () {
         }
     }
 
+    ////////////////////////////////////////////////////////
+    // Filter the list of items by 'IsDone' field/property
+    ////////////////////////////////////////////////////////
+    self.filteredIsDoneItems = ko.computed(function () {
+        var filter = self.selected();
+        if (!filter || filter == 'All Items') {
+            return self.toDoList();
+        } else if (filter == 'Not Done') {
+            return ko.utils.arrayFilter(self.toDoList(), function (i) {
+                return i.IsDone == false;
+            });
+        } else {
+            return ko.utils.arrayFilter(self.toDoList(), function (i) {
+                return i.IsDone == true;
+            });
+        }
+    });
+    
     getToDoList();
 };
 ko.applyBindings(new ViewModel());
