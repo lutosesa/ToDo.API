@@ -12,6 +12,7 @@
 
             bundles.Add(new ScriptBundle("~/bundles/app").Include(
               "~/Scripts/knockout-{version}.js",
+              "~/Scripts/bootbox.js",
               "~/Scripts/ToDo/app.js"));
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're

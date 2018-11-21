@@ -6,7 +6,7 @@ var ViewModel = function () {
     var toDoListUri = '/api/ToDoLists/';
 
     // Headline for the column/field "IsDone"
-    var seletedHeadlines = ['All Items', 'Not Done', 'Done']
+    var seletedHeadlines = ['Not Done', 'Done', 'All Items']
 
     // Used to define model properties which can notify the changes 
     // and update the model automatically.
@@ -32,7 +32,7 @@ var ViewModel = function () {
             contentType: 'application/json',
             data: data ? JSON.stringify(data) : null
         }).fail(function (jqXHR, textStatus, errorThrown) {
-            alert('Error : ' + errorThrown);
+            bootbox.alert('Error : ' + errorThrown);
         });
     }
 
@@ -66,13 +66,13 @@ var ViewModel = function () {
         if (ToDoObject.Description != '' ) {
             ajaxFunction(toDoListUri, 'POST', ToDoObject).done(function () {
                 self.clearFields();
-                alert('ToDo Added Successfully !');
+                bootbox.alert('ToDo-item Added Successfully!');
                 //self.toDoList.push(ToDoObject);
                 getToDoList()
             });
         }
         else {
-            alert('Please Enter a value in the field "Thing to Do" for adding!!');
+            bootbox.alert('Please Enter a value in the field "Thing to Do" for adding!!');
         }
     }
 
@@ -109,13 +109,13 @@ var ViewModel = function () {
         };
         if (ToDoObject.Description != "") {
             ajaxFunction(toDoListUri + self.Id(), 'PUT', ToDoObject).done(function () {
-                alert('ToDo Updated Successfully !');
+                bootbox.alert('ToDo-item Updated Successfully !');
                 getToDoList();
                 self.cancel();
             });
         }
         else {
-            alert('Please Enter a value in the field "Thing to Do" for updating!!');
+            bootbox.alert('Please Enter a value in the field "Thing to Do" for updating!!');
         }
     }
 
@@ -123,11 +123,14 @@ var ViewModel = function () {
     //DELETE / Remove an toDoList object from the list and database
     /////////////////////////////////////////////////////////////////
     self.deleteToDo = function (toDo) {
-        if (confirm('Are you sure to Delete this item (ID=' + toDo.Id + ')?')) {
-            ajaxFunction(toDoListUri + toDo.Id, 'DELETE').done(function () {
-                getToDoList();
-            })
-        }
+        bootbox.confirm('Are you sure to Delete this item (ID=' + toDo.Id + ')?',
+            function (result) {
+                if (result) {
+                    ajaxFunction(toDoListUri + toDo.Id, 'DELETE').done(function () {
+                        getToDoList();
+                    })
+            }           
+        });
     }
 
     ////////////////////////////////////////////////////////
@@ -135,16 +138,16 @@ var ViewModel = function () {
     ////////////////////////////////////////////////////////
     self.filteredIsDoneItems = ko.computed(function () {
         var filter = self.selected();
-        if (!filter || filter == 'All Items') {
-            return self.toDoList();
-        } else if (filter == 'Not Done') {
+        if (filter == 'Not Done') {
             return ko.utils.arrayFilter(self.toDoList(), function (i) {
                 return i.IsDone == false;
             });
-        } else {
+        } else if (filter == 'Done') {
             return ko.utils.arrayFilter(self.toDoList(), function (i) {
                 return i.IsDone == true;
             });
+        } else {
+            return self.toDoList();
         }
     });
     
